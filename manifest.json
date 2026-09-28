@@ -1,17 +1,9 @@
 {
-  "name": "JK Joshi",
-  "short_name": "JK",
+  "name": "JK_Joshi",
+  "short_name": "JK_Joshi",
   "start_url": "./",
-  "scope": "./",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#1f4e78",
-  "icons": [
-    {
-      "src": "./icon.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ]
+  "theme_color": "#222222",
+  "orientation": "portrait"
 }
