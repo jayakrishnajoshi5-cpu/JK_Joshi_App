@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#1f4e78">
+<title>JK_Joshi</title>
+<link rel="manifest" href="manifest.json">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f3f6fa;color:#1d2939}
+header{background:#1f4e78;color:white;padding:18px 16px;border-radius:0 0 18px 18px}
+header h1{margin:0;font-size:25px}header p{margin:5px 0 0;opacity:.85}
+.container{max-width:700px;margin:auto;padding:16px}
+.card{background:white;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 3px 12px #00000012}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+button,.tab{border:0;border-radius:12px;padding:13px;font-size:15px;cursor:pointer}
+.menu{background:#fff;text-align:left;box-shadow:0 2px 8px #00000010}
+.primary{background:#1f4e78;color:#fff}.green{background:#e8f7ee}.blue{background:#eaf2ff}.orange{background:#fff3df}
+label{display:block;margin:9px 0 5px;font-size:14px;font-weight:bold}
+input,select{width:100%;padding:12px;border:1px solid #d0d5dd;border-radius:10px;font-size:15px}
+.hidden{display:none}.stat{font-size:25px;font-weight:bold;margin-top:6px}.muted{color:#667085;font-size:13px}
+.progress{height:10px;background:#e5e7eb;border-radius:20px;overflow:hidden}.bar{height:100%;background:#1f4e78}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px;border-bottom:1px solid #eee;text-align:left}
+nav{position:sticky;bottom:0;background:white;padding:10px;display:grid;grid-template-columns:repeat(4,1fr);gap:7px;border-top:1px solid #ddd}
+nav button{background:#eef2f6}.active{background:#1f4e78;color:white}
+h2{margin:4px 0 12px}
+</style>
+</head>
+<body>
+<div id="app">
+<header><h1>JK_Joshi</h1><p>Staff Target & Achievement Reporting</p></header>
+<div class="container">
+
+<section id="dashboard">
+<h2>Dashboard</h2>
+<div class="grid">
+<div class="card blue"><div class="muted">Monthly Target</div><div class="stat" id="mTarget">0</div></div>
+<div class="card green"><div class="muted">Monthly Achievement</div><div class="stat" id="mAch">0</div></div>
+<div class="card orange"><div class="muted">Quarterly Target</div><div class="stat" id="qTarget">0</div></div>
+<div class="card green"><div class="muted">Yearly Achievement</div><div class="stat" id="yAch">0</div></div>
+</div>
+<div class="card"><b>Overall Achievement</b><div class="stat" id="overall">0%</div><div class="progress"><div class="bar" id="overallBar" style="width:0%"></div></div></div>
+<div class="grid">
+<button class="menu" onclick="show('staff')">👤 Staff</button>
+<button class="menu" onclick="show('entry')">🎯 Target / Achievement</button>
+<button class="menu" onclick="show('report')">📊 Reports</button>
+<button class="menu" onclick="resetData()">🔄 Demo Reset</button>
+</div>
+</section>
+
+<section id="staff" class="hidden">
+<h2>Staff</h2>
+<div class="card">
+<label>Staff Name</label><input id="staffName" placeholder="जस्तै: Ram Thapa">
+<label>Branch</label><input id="branch" placeholder="जस्तै: Butwal">
+<button class="primary" style="margin-top:12px;width:100%" onclick="addStaff()">+ Add Staff</button>
+</div>
+<div class="card"><table><thead><tr><th>Name</th><th>Branch</th></tr></thead><tbody id="staffTable"></tbody></table></div>
+</section>
+
+<section id="entry" class="hidden">
+<h2>Target & Achievement</h2>
+<div class="card">
+<label>Staff</label><select id="staffSelect"></select>
+<label>Period</label><select id="period"><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option><option value="yearly">Yearly</option></select>
+<label>Target</label><input id="target" type="number" min="0" value="0">
+<label>Achievement</label><input id="achievement" type="number" min="0" value="0">
+<button class="primary" style="margin-top:12px;width:100%" onclick="saveEntry()">Save</button>
+</div>
+<div class="card"><b>Achievement %</b><div class="stat" id="preview">0%</div><p class="muted">100% भन्दा माथि भए 100% मा सीमित हुनेछ।</p></div>
+</section>
+
+<section id="report" class="hidden">
+<h2>Reports</h2>
+<div class="card">
+<label>Filter</label><select id="reportPeriod" onchange="renderReport()"><option value="all">All</option><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option><option value="yearly">Yearly</option></select>
+</div>
+<div class="card"><table><thead><tr><th>Staff</th><th>Period</th><th>Target</th><th>Ach.</th><th>%</th></tr></thead><tbody id="reportTable"></tbody></table></div>
+</section>
+</div>
+<nav>
+<button class="active" onclick="show('dashboard',this)">🏠 Home</button>
+<button onclick="show('staff',this)">👤 Staff</button>
+<button onclick="show('entry',this)">🎯 Entry</button>
+<button onclick="show('report',this)">📊 Report</button>
+</nav>
+</div>
+
+<script>
+let data=JSON.parse(localStorage.getItem('jkjoshi')||'null')||{
+staff:[{name:'Demo Staff',branch:'Main Branch'}],
+entries:[
+{name:'Demo Staff',period:'monthly',target:100,achievement:75},
+{name:'Demo Staff',period:'quarterly',target:300,achievement:240},
+{name:'Demo Staff',period:'yearly',target:1200,achievement:900}
+]};
+function save(){localStorage.setItem('jkjoshi',JSON.stringify(data));}
+function pct(t,a){return t>0?Math.min(100,Math.max(0,a/t*100)):0}
+function show(id,btn){
+['dashboard','staff','entry','report'].forEach(x=>document.getElementById(x).classList.add('hidden'));
+document.getElementById(id).classList.remove('hidden');
+document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active')); if(btn)btn.classList.add('active');
+if(id==='dashboard')renderDash(); if(id==='staff')renderStaff(); if(id==='entry')renderSelect(); if(id==='report')renderReport();
+}
+function addStaff(){
+let n=document.getElementById('staffName').value.trim(),b=document.getElementById('branch').value.trim();
+if(!n||!b)return alert('Staff Name र Branch भर्नुहोस्।'); data.staff.push({name:n,branch:b});save();
+document.getElementById('staffName').value='';document.getElementById('branch').value='';renderStaff();renderSelect();alert('Staff added');
+}
+function renderStaff(){document.getElementById('staffTable').innerHTML=data.staff.map(s=>`<tr><td>${s.name}</td><td>${s.branch}</td></tr>`).join('')}
+function renderSelect(){document.getElementById('staffSelect').innerHTML=data.staff.map(s=>`<option>${s.name}</option>`).join('')}
+function saveEntry(){
+let name=document.getElementById('staffSelect').value,period=document.getElementById('period').value,target=+document.getElementById('target').value||0,achievement=+document.getElementById('achievement').value||0;
+data.entries.push({name,period,target,achievement});save();renderDash();renderReport();alert('Saved successfully');show('dashboard');
+}
+function renderDash(){
+let sum=p=>data.entries.filter(e=>e.period===p).reduce((x,e)=>({t:x.t+e.target,a:x.a+e.achievement}),{t:0,a:0});
+let m=sum('monthly'),q=sum('quarterly'),y=sum('yearly'),o=sum('yearly');
+document.getElementById('mTarget').textContent=m.t;document.getElementById('mAch').textContent=m.a;document.getElementById('qTarget').textContent=q.t;document.getElementById('yAch').textContent=y.a;
+let p=pct(o.t,o.a);document.getElementById('overall').textContent=p.toFixed(1)+'%';document.getElementById('overallBar').style.width=p+'%';
+}
+function renderReport(){
+let f=document.getElementById('reportPeriod').value;
+document.getElementById('reportTable').innerHTML=data.entries.filter(e=>f==='all'||e.period===f).map(e=>`<tr><td>${e.name}</td><td>${e.period}</td><td>${e.target}</td><td>${e.achievement}</td><td>${pct(e.target,e.achievement).toFixed(1)}%</td></tr>`).join('');
+}
+function resetData(){if(confirm('Demo data reset गर्ने?')){localStorage.removeItem('jkjoshi');location.reload()}}
+document.getElementById('achievement').addEventListener('input',()=>{document.getElementById('preview').textContent=pct(+document.getElementById('target').value||0,+document.getElementById('achievement').value||0).toFixed(1)+'%'});
+document.getElementById('target').addEventListener('input',()=>document.getElementById('achievement').dispatchEvent(new Event('input')));
+renderDash();
+</script>
+</body></html>
