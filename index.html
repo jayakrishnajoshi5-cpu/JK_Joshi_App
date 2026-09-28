@@ -2,28 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#222222">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <meta
-    name="theme-color"
-    content="#222222"
-  >
-
-  <link
-    rel="manifest"
-    href="manifest.json"
-  >
+  <link rel="manifest" href="manifest.json">
 
   <title>JK_Joshi</title>
 
   <style>
-
-    html,
-    body {
+    html, body {
       margin: 0;
       padding: 0;
       width: 100%;
@@ -36,7 +23,6 @@
       height: 100%;
       border: 0;
     }
-
   </style>
 </head>
 
@@ -44,41 +30,21 @@
 
   <iframe
     src="https://script.google.com/macros/s/AKfycbzv4HE1ie9sXhxqUlx_0Q7CwknbMph_s-lvkx4Q5_OPyi6ZjBRZB-H-Nqvs1fIA8r6C4g/exec"
-    allow="fullscreen"
-  ></iframe>
-
+    allow="fullscreen">
+  </iframe>
 
   <script>
-
     if ("serviceWorker" in navigator) {
-
-      window.addEventListener(
-        "load",
-        function() {
-
-          navigator.serviceWorker
-            .register("service-worker.js")
-            .then(function() {
-
-              console.log(
-                "Service Worker registered"
-              );
-
-            })
-            .catch(function(error) {
-
-              console.log(
-                "Service Worker error:",
-                error
-              );
-
-            });
-
-        }
-      );
-
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.register("service-worker.js")
+          .then(function () {
+            console.log("Service Worker registered");
+          })
+          .catch(function (error) {
+            console.log("Service Worker error:", error);
+          });
+      });
     }
-
   </script>
 
 </body>
